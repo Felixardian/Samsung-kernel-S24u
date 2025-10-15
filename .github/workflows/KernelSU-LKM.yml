@@ -30,26 +30,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 8192
-          temp-reserve-mb: 2048
-          swap-size-mb: 8192
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-
       - name: Install Dependencies
         run: |
           sudo apt update
           sudo apt install -y clang llvm lld git zip build-essential xz-utils bison flex libz-dev libssl-dev libelf-dev bc cpio python3 pahole
-
-      - name: Install Repo and Python
-        run: |
-          sudo apt update
-          sudo apt install repo python3 python-is-python3
 
       - name: Set CONFIG Environment Variable
         run: |
