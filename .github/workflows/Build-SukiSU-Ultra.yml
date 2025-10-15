@@ -47,11 +47,6 @@ jobs:
           sudo apt update
           sudo apt install -y clang llvm lld git zip build-essential xz-utils bison flex libz-dev libssl-dev libelf-dev bc cpio python3 pahole lz4
 
-      - name: Install Repo and Python
-        run: |
-          sudo apt update
-          sudo apt install repo python3 python-is-python3
-
       - name: Set CONFIG Environment Variable
         run: |
           CONFIG="${{ inputs.model }}"
