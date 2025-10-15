@@ -95,7 +95,7 @@ jobs:
 
           cd ./KernelSU-Next
           echo "Applying next SUSFS patches..."
-          cp ../../kernel_ls_patches/KSUN/KSUN/KSUN-SUSFS-1.5.12.patch ./
+          cp ../../kernel_ls_patches/KSUN/KSUN-SUSFS-1.5.12.patch ./
           patch -p1 < KSUN/KSUN-SUSFS-1.5.12.patch || true
           
           cd ../
