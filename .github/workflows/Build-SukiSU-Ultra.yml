@@ -102,7 +102,7 @@ jobs:
           cd ./KernelSU
           echo "Applying next SUSFS patches..."
           cp ../../kernel_ls_patches/SukiSU/SukiSU-SUSFS-1.5.12.patch ./
-          patch -p1 < SukuSU-SUSFS-1.5.12.patch || true
+          patch -p1 < SukiSU-SUSFS-1.5.12.patch || true
           cd ../
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
