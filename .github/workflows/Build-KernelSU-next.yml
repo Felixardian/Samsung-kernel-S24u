@@ -65,7 +65,7 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/Felixardian/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/Felixardian/kernel_ls_patches.git
+          git clone --depth=1 https://github.com/TheWildJames/kernel_patches.git
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -95,11 +95,20 @@ jobs:
 
           cd ./KernelSU-Next
           echo "Applying next SUSFS patches..."
-          cp ../../kernel_ls_patches/KSUN/WildJames-Manager.patch ./
-          patch -p1 < WildJames-Manager.patch || true
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 < 10_enable_susfs_for_ksu.patch  || true
           
-          cp ../../kernel_ls_patches/KSUN/KSUN-SUSFS-1.5.12.patch ./
-          patch -p1 < KSUN-SUSFS-1.5.12.patch || true
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_apk_sign.c.patch ./
+          patch -p1 < fix_apk_sign.c.patch
+          
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_kernel_compat.c.patch ./
+          patch -p1 < fix_kernel_compat.c.patch
+          
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_apk_sign.c.patch ./
+          patch -p1 < fix_core_hook.c.patch
+          
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_sucompat.c.patch ./
+          patch -p1 < fix_sucompat.c.patch
                     
           cd ../
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
@@ -107,7 +116,7 @@ jobs:
       - name: Apply KSU Hooks
         run: |
           cd "$CONFIG"
-          cp ../kernel_ls_patches/KSUN/scope_min_manual_hooks_v1.4.patch ./
+          cp ../kernel_patches/next/scope_min_manual_hooks_v1.4.patch ./
           patch -p1 --fuzz=3 < ./scope_min_manual_hooks_v1.4.patch
 
       - name: Apply Hide Stuff Patches
