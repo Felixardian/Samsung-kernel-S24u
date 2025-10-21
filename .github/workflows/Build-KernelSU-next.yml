@@ -92,7 +92,7 @@ jobs:
           echo "Applying SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          cp ../patch/50_kerel.patch ./                    
+          cp ../patch/50_kernel.patch ./                    
 
           cd ./KernelSU-Next
           echo "Applying next SUSFS patches..."
