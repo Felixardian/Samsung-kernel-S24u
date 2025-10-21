@@ -95,7 +95,7 @@ jobs:
         run: |
           cd "$CONFIG"
           echo "Applying SUSFS patches..."
-          cp ../patch/50_kerel.patch ./
+          cp ../patch/50_kernel.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           
