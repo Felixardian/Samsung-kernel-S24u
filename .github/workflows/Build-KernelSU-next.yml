@@ -65,7 +65,7 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/Felixardian/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone --depth=1 https://github.com/TheWildJames/kernel_patches.git
+#           git clone --depth=1 https://github.com/TheWildJames/kernel_patches.git
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -89,42 +89,30 @@ jobs:
         run: |
           cd "$CONFIG"
           echo "Applying SUSFS patches..."
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+          cp ../patch/50_kerel.patch ./                    
 
           cd ./KernelSU-Next
           echo "Applying next SUSFS patches..."
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch  || true
-          
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_apk_sign.c.patch ./
-          patch -p1 < fix_apk_sign.c.patch
-          
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_core_hook.c.patch ./
-          patch -p1 < fix_core_hook.c.patch
-          
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_kernel_compat.c.patch ./
-          patch -p1 < fix_kernel_compat.c.patch
-          
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_sucompat.c.patch ./
-          patch -p1 < fix_sucompat.c.patch
+          cp ../../patch/kernel.patch ./
+          patch -p1 < kernel.patch
                     
           cd ../
-          patch -p1 --forward --fuzz=3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 < 50_kernel.patch || true
 
-      - name: Apply KSU Hooks
-        run: |
-          cd "$CONFIG"
-          cp ../kernel_patches/next/scope_min_manual_hooks_v1.4.patch ./
-          patch -p1 --fuzz=3 < ./scope_min_manual_hooks_v1.4.patch
+#      - name: Apply KSU Hooks
+#        run: |
+#          cd "$CONFIG"
+#          cp ../kernel_patches/next/scope_min_manual_hooks_v1.4.patch ./
+#          patch -p1 --fuzz=3 < ./scope_min_manual_hooks_v1.4.patch
 
-      - name: Apply Hide Stuff Patches
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch
+#      - name: Apply Hide Stuff Patches
+#        run: |
+#          echo "Changing to configuration directory: $CONFIG..."
+#          cd "$CONFIG"
+#          cp ../kernel_patches/69_hide_stuff.patch ./
+#          patch -p1 -F 3 < 69_hide_stuff.patch
 
       - name: Add SUSFS Configuration Settings
         run: |
