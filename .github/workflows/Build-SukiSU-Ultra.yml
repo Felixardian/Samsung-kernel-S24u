@@ -68,6 +68,7 @@ jobs:
           git clone https://github.com/Felixardian/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/ShirkNeko/SukiSU_patch.git
+          git clone https://github.com/Felixardian/patch.git
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -94,17 +95,17 @@ jobs:
         run: |
           cd "$CONFIG"
           echo "Applying SUSFS patches..."
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../patch/50_kerel.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           
-          patch -p1 --forward --fuzz=3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 < 50_kernel.patch
 
-      - name: Apply KSU Hooks
-        run: |
-          cd "$CONFIG"
-          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
-          patch -p1 --fuzz=3 < ./syscall_hooks.patch
+#      - name: Apply KSU Hooks
+#        run: |
+#          cd "$CONFIG"
+#          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
+#          patch -p1 --fuzz=3 < ./syscall_hooks.patch
 
       - name: Add SUSFS Configuration Settings
         run: |
