@@ -115,6 +115,14 @@ jobs:
 #          cp ../kernel_patches/69_hide_stuff.patch ./
 #          patch -p1 -F 3 < 69_hide_stuff.patch
 
+      - name: Add BBG
+        run: |
+          cd "$CONFIG"
+          echo "Adding BBG..."
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
+          echo "CONFIG_BBG=y" >> common/arch/arm64/configs/pineapple_gki_defconfig
+          sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' common/security/Kconfig
+
       - name: Add SUSFS Configuration Settings
         run: |
           cd "$CONFIG"
