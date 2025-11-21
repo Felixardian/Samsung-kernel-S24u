@@ -95,10 +95,10 @@ jobs:
           cd ../
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
-          cp ../../kernel_patches/samsung/S24/fix_namespace.patch ./
+          cp ../kernel_patches/samsung/S24/fix_namespace.patch ./
           patch -p1 < fix_namespace.patch || true
 
-          cp ../../kernel_patches/samsung/S24/fix_base.patch ./
+          cp ../kernel_patches/samsung/S24/fix_base.patch ./
           patch -p1 < fix_base.patch || true
 
       - name: Add SUSFS Configuration Settings
