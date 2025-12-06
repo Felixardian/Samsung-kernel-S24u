@@ -66,7 +66,7 @@ jobs:
           git clone https://github.com/Felixardian/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/Felixardian/patch.git
-#           git clone --depth=1 https://github.com/TheWildJames/kernel_patches.git
+          git clone --depth=1 https://github.com/TheWildJames/kernel_patches.git
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -90,17 +90,28 @@ jobs:
         run: |
           cd "$CONFIG"
           echo "Applying SUSFS patches..."
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
-          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          cp ../patch/50_kernel.patch ./                    
+          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/                    
 
           cd ./KernelSU-Next
           echo "Applying next SUSFS patches..."
-          cp ../../patch/kernel.patch ./
-          patch -p1 < kernel.patch
-                    
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward --fuzz=3 < 10_enable_susfs_for_ksu.patch || true
+          
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_apk_sign.c.patch ./
+          patch -p1 < fix_apk_sign.c.patch
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_core_hook.c.patch ./
+          patch -p1 < fix_core_hook.c.patch
+
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_kernel_compat.c.patch ./
+          patch -p1 < fix_kernel_compat.c.patch
+
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.12/fix_sucompat.c.patch
+          patch -p1 < fix_sucompat.c.patch          
+                            
           cd ../
-          patch -p1 < 50_kernel.patch || true
+          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
       - name: Apply KSU Hooks
         run: |
@@ -141,7 +152,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           TARGET_DEFCONFIG="${{ inputs.soc }}_gki_defconfig"
-          LOCALVERSION="-${{ inputs.android_version }}-android14-11-31999054-abS9280ZHS4CYJ7
+          LOCALVERSION="-android14-11-31999054-abS9280ZHS4CYJ7
           if [[ "${{ inputs.lto }}" == "thin" ]]; then
             LOCALVERSION+="-thin"
           fi
