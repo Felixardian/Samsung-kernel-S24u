@@ -73,13 +73,13 @@ jobs:
 
       - name: Add KernelSU
         run: |
-          cd "$CONFIG"/common
+          cd "$CONFIG"/Samsung24uKernel/commom
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
       - name: Apply SUSFS Patches
         run: |
-          cd "$CONFIG"/commom
+          cd "$CONFIG"/Samsung24uKernel/commom
           echo "Applying SUSFS patches..."
           cp ../../patch/pineapple_gki_defconfig ./arch/arm64/configs/
           cp ../../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
