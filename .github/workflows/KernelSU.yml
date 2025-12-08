@@ -69,7 +69,7 @@ jobs:
           mkdir -p "$CONFIG"
           cd "$CONFIG"
           echo "Cloning kernel source..."
-          git clone https://github.com/Felixardian/Samsung24uKernel.git
+          git clone --branch ${{ inputs.branch }} --single-branch https://github.com/Felixardian/Samsung24uKernel.git
           git --version
           git status
 
