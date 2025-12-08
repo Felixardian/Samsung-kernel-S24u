@@ -70,13 +70,13 @@ jobs:
 
       - name: Add KernelSU
         run: |
-          cd Samsung24uKernel/commom
+          cd Samsung24uKernel/common
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
       - name: Apply SUSFS Patches
         run: |
-          cd Samsung24uKernel/commom
+          cd Samsung24uKernel/common
           echo "Applying SUSFS patches..."
           cp ../../patch/pineapple_gki_defconfig ./arch/arm64/configs/
           cp ../../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
@@ -132,7 +132,7 @@ jobs:
 
       - name: Configure Kernel
         run: |
-          cd "$CONFIG"
+          cd Samsung24uKernel/common
           echo "Configuring kernel..."
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH $TARGET_DEFCONFIG
           ./scripts/config --file out/.config \
@@ -149,14 +149,14 @@ jobs:
 
       - name: Build Kernel
         run: |
-          cd "$CONFIG"
+          cd Samsung24uKernel/common
           echo "Building kernel..."
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH LOCALVERSION=$LOCALVERSION CC=$CC LLVM=$LLVM LLVM_IAS=$LLVM_IAS
 
       - name: Prepare AnyKernel3 Folder
         run: |
           mkdir -p AnyKernel3
-          cp "$CONFIG/out/arch/arm64/boot/Image" AnyKernel3/zImage
+          cp Samsung24uKernel/common/out/arch/arm64/boot/Image" AnyKernel3/zImage
 
       - name: Create ZIP Files for Different Formats
         run: |
