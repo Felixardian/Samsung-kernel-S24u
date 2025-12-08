@@ -61,7 +61,7 @@ jobs:
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/Felixardian/AnyKernel3.git
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
-          git clone https://github.com/WildPlusKernel/kernel_patches.git
+          git clone https://github.com/Felixardian/patch.git
 
       - name: Initialize and Sync Kernel Source
         run: |
@@ -69,37 +69,36 @@ jobs:
           mkdir -p "$CONFIG"
           cd "$CONFIG"
           echo "Cloning kernel source..."
-          git clone --branch ${{ inputs.branch }} --single-branch https://github.com/Felixardian/Samsung24U_sm8650_kernel.git .
+          git clone https://github.com/Felixardian/Samsung24uKernel.git
           git --version
           git status
 
       - name: Add KernelSU
         run: |
-          cd "$CONFIG"
+          cd "$CONFIG"/common
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
 
       - name: Apply SUSFS Patches
         run: |
-          cd "$CONFIG"
+          cd "$CONFIG"/commom
           echo "Applying SUSFS patches..."
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../susfs4ksu/kernel_patches/fs/* ./fs/
-          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          cp ../kernel_patches/samsung/S24U/fix_namespace.patch ./
-          cp ../kernel_patches/samsung/S24U/fix_base.patch ./
+          cp ../../patch/pineapple_gki_defconfig ./arch/arm64/configs/
+          cp ../../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../../susfs4ksu/kernel_patches/fs/* ./fs/
+          cp ../../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+          cp ../../patch/fix_50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./    
           
           cd ./KernelSU
           echo "Applying next SUSFS patches..."
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 -F 3 < 10_enable_susfs_for_ksu.patch || true
+          patch -p1 < 10_enable_susfs_for_ksu.patch || true
           
           cd ../
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
-          patch -p1 < fix_namespace.patch || true
+          patch -p1 < fix_50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
-          patch -p1 < fix_base.patch || true
 
       - name: Add SUSFS Configuration Settings
         run: |
