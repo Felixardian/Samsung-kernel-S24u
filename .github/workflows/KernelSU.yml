@@ -60,7 +60,8 @@ jobs:
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/Felixardian/AnyKernel3.git
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
+          # 使用变量克隆 susfs，避免分支硬编码
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/Felixardian/patch.git
 
       - name: Initialize and Sync Kernel Source
@@ -86,12 +87,12 @@ jobs:
           cp ../../patch/0001-lz4-1.10.patch ./
           cp ../../patch/69_hide_stuff.patch ./
           
-          cd ./KernelSU
+          cd ./KernelSU || true
           echo "Applying next SUSFS patches..."
           cp ../../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1 < 10_enable_susfs_for_ksu.patch || true
           
-          cd ../
+          cd ../ || true
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           patch -p1 < fix_50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
@@ -100,7 +101,7 @@ jobs:
 
           patch -p1 < 69_hide_stuff.patch || true
 
-      - name: Set Environment Variables
+      - name: Set Environment Variables and Build (fixed ARCH usage)
         run: |
           cd Samsung24uKernel/common
           TARGET_DEFCONFIG="${{ inputs.soc }}_gki_defconfig"
@@ -108,13 +109,17 @@ jobs:
           if [[ "${{ inputs.lto }}" == "thin" ]]; then
             LOCALVERSION+="-thin"
           fi
+          # 在当前 shell 中导出变量（使得下面的 make 可以直接使用）
+          export TARGET_DEFCONFIG LOCALVERSION ARCH=arm64 CC=clang LLVM=1 LLVM_IAS=1
+          # 仍然写入 GITHUB_ENV 以便后续 steps 可用
           echo "TARGET_DEFCONFIG=$TARGET_DEFCONFIG" >> $GITHUB_ENV
           echo "LOCALVERSION=$LOCALVERSION" >> $GITHUB_ENV
-          echo "ARCH=arm64" >> $GITHUB_ENV
-          echo "CC=clang" >> $GITHUB_ENV
-          echo "LLVM=1" >> $GITHUB_ENV
-          echo "LLVM_IAS=1" >> $GITHUB_ENV
+          echo "ARCH=$ARCH" >> $GITHUB_ENV
+          echo "CC=$CC" >> $GITHUB_ENV
+          echo "LLVM=$LLVM" >> $GITHUB_ENV
+          echo "LLVM_IAS=$LLVM_IAS" >> $GITHUB_ENV
           echo "Configuring kernel..."
+          # 注意：这里引用的是当前 shell 的 ARCH 变量（已 export）
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH $TARGET_DEFCONFIG
           ./scripts/config --file out/.config \
             -d UH \
@@ -131,8 +136,9 @@ jobs:
 
       - name: Prepare AnyKernel3 Folder
         run: |
-          mkdir -p AnyKernel3
-          cp Samsung24uKernel/common/out/arch/arm64/boot/Image" AnyKernel3/zImage
+          # AnyKernel3 已经在仓库根目录被 clone
+          # 修复多余的引号并且从构建输出拷贝 Image 到 AnyKernel3
+          cp Samsung24uKernel/common/out/arch/arm64/boot/Image AnyKernel3/zImage || true
 
       - name: Create ZIP Files for Different Formats
         run: |
