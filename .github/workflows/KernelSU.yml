@@ -125,7 +125,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           TARGET_DEFCONFIG="${{ inputs.soc }}_gki_defconfig"
-          LOCALVERSION="-android14-11-31999054-abS9280ZHS4CYJ7
+          LOCALVERSION="-${{ inputs.android_version }}-Felixardian"
           if [[ "${{ inputs.lto }}" == "thin" ]]; then
             LOCALVERSION+="-thin"
           fi
@@ -158,7 +158,6 @@ jobs:
           cd "$CONFIG"
           echo "Building kernel..."
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH LOCALVERSION=$LOCALVERSION CC=$CC LLVM=$LLVM LLVM_IAS=$LLVM_IAS
-
       - name: Prepare AnyKernel3 Folder
         run: |
           mkdir -p AnyKernel3
@@ -167,7 +166,7 @@ jobs:
       - name: Create ZIP Files for Different Formats
         run: |
           cd AnyKernel3
-          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_Next_SUSFS.zip"
+          ZIP_NAME="${{ inputs.model }}_${{ inputs.android_version }}_${{ inputs.kernel_version }}_LKM.zip"
           zip -r "../$ZIP_NAME" .
 
       - name: Upload Build Artifacts
@@ -175,4 +174,4 @@ jobs:
         with:
           name: kernel-${{ env.CONFIG }}
           path: |
-            *.zip          
+            *.zip      
