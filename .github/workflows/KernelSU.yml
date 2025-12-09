@@ -102,6 +102,7 @@ jobs:
 
       - name: Set Environment Variables
         run: |
+          cd Samsung24uKernel/common
           TARGET_DEFCONFIG="${{ inputs.soc }}_gki_defconfig"
           LOCALVERSION="-android14-11-31999054-abS9280ZHS4CYJ7"
           if [[ "${{ inputs.lto }}" == "thin" ]]; then
@@ -113,10 +114,6 @@ jobs:
           echo "CC=clang" >> $GITHUB_ENV
           echo "LLVM=1" >> $GITHUB_ENV
           echo "LLVM_IAS=1" >> $GITHUB_ENV
-
-      - name: Configure Kernel
-        run: |
-          cd Samsung24uKernel/common
           echo "Configuring kernel..."
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH $TARGET_DEFCONFIG
           ./scripts/config --file out/.config \
@@ -130,11 +127,6 @@ jobs:
           if [[ "${{ inputs.lto }}" == "thin" ]]; then
             ./scripts/config --file out/.config -e LTO_CLANG_THIN -d LTO_CLANG_FULL
           fi
-
-      - name: Build Kernel
-        run: |
-          cd Samsung24uKernel/common
-          echo "Building kernel..."
           make -j$(nproc) O=$(pwd)/out ARCH=$ARCH LOCALVERSION=$LOCALVERSION CC=$CC LLVM=$LLVM LLVM_IAS=$LLVM_IAS
 
       - name: Prepare AnyKernel3 Folder
