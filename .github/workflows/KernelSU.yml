@@ -69,7 +69,9 @@ jobs:
           mkdir -p "$CONFIG"
           cd "$CONFIG"
           echo "Cloning kernel source..."
-          git clone https://github.com/Felixardian/Samsung24U_sm8650_kernel.git
+          git clone --branch ${{ inputs.branch }} --single-branch https://github.com/Felixardian/Samsung24U_sm8650_kernel.git .
+          git --version
+          git status
 
       - name: Add KernelSU
         run: |
@@ -85,7 +87,6 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           cp ../patch/fix_50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../patch/0001-lz4-1.10.patch ./
           cp ../patch/69_hide_stuff.patch ./
           
           cd ./KernelSU || true
@@ -97,8 +98,6 @@ jobs:
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           patch -p1 < fix_50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-
-          patch -p1 < 0001-lz4-1.10.patch || true
 
           patch -p1 < 69_hide_stuff.patch || true
           
